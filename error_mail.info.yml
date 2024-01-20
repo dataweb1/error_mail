@@ -1,0 +1,7 @@
+name: Error Mail
+description: 'Drupal module that sends out a mail when an error is triggered. Settings via: /admin/config/development/logging'
+type: module
+core_version_requirement: ^9 || ^10
+package: Logging
+dependencies:
+  - drupal:phpmailer_smtp

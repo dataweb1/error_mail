@@ -1,0 +1,6 @@
+services:
+  error_mail.error_logger:
+    class: Drupal\error_mail\Logger\ErrorLogger
+    arguments: ['@config.factory', '@renderer']
+    tags:
+      - { name: logger }
