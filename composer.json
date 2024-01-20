@@ -1,0 +1,23 @@
+{
+    "name": "dataweb1/error_mail",
+    "description": "Drupal module that sends out a mail when an error is triggered.",
+    "type": "drupal-module",
+    "homepage": "https://github.com/dataweb1/error_mail",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://www.drupal.org/about/10"
+        }
+    ],
+    "require": {
+        "drupal/phpmailer_smtp": "^2.2"
+    },
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Bert Jansen",
+            "email": "bert@data-web.be",
+            "role": "Owner"
+        }
+    ]
+}
