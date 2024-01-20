@@ -52,7 +52,7 @@ class ErrorLogger implements LoggerInterface {
   }
 
   /**
-   *
+   * @throws \Exception
    */
   public function log($level, $message, array $context = []): void {
     // Check if the log level is 'emergency', 'alert', 'critical', 'error'.
@@ -115,7 +115,7 @@ class ErrorLogger implements LoggerInterface {
       '#theme' => 'item_list',
       '#list_type' => 'ul',
       '#items' => [
-        'URI: ' . $currentRequest->getRequestUri(),
+        'URI: ' . $currentRequest->getUri(),
         'Referer: ' . $currentRequest->server->get('HTTP_REFERER'),
         'User: ' . \Drupal::currentUser()->getAccountName() . ' (' . \Drupal::currentUser()->getEmail() . ')',
       ],
@@ -176,7 +176,7 @@ class ErrorLogger implements LoggerInterface {
         $count,
         $current_file,
         $current_line,
-        $frame['function'],
+        $frame['function'] ?? '',
         $args);
       $count++;
     }
