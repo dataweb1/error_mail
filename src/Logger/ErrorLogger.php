@@ -117,6 +117,7 @@ class ErrorLogger implements LoggerInterface {
       '#items' => [
         'URI: ' . $currentRequest->getRequestUri(),
         'Referer: ' . $currentRequest->server->get('HTTP_REFERER'),
+        'User: ' . \Drupal::currentUser()->getAccountName() . ' (' . \Drupal::currentUser()->getEmail() . ')',
       ],
     ];
 
