@@ -60,8 +60,7 @@ class ErrorLogger implements LoggerInterface {
     if ($this->mailTo == '') {
       return;
     }
-dpm($level);
-    dpm($context);
+
     // Check if the log level is 'emergency', 'alert', 'critical', 'error'.
     if (in_array($level, $this->levels)) {
       $exception = $context['exception'];
