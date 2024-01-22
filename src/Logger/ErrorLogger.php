@@ -7,6 +7,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Render\Renderer;
+use Drupal\error_mail\ExceptionsToIgnore;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -55,10 +56,24 @@ class ErrorLogger implements LoggerInterface {
    * @throws \Exception
    */
   public function log($level, $message, array $context = []): void {
+    // No mail adddress set, no erro mail.
+    if ($this->mailTo == '') {
+      return;
+    }
+dpm($level);
+    dpm($context);
     // Check if the log level is 'emergency', 'alert', 'critical', 'error'.
     if (in_array($level, $this->levels)) {
-      // Handle the error email.
-      $this->sendErrorMail($context);
+      $exception = $context['exception'];
+
+      $class = get_class($exception);
+      //if (!ExceptionsToIgnore::ignore($class)) {
+        // Add exception class name to context.
+        $context['%exception_class'] = $class;
+
+        // Handle the error email.
+        $this->sendErrorMail($context);
+      //}
     }
   }
 
@@ -69,10 +84,8 @@ class ErrorLogger implements LoggerInterface {
    * @throws \Exception
    */
   protected function sendErrorMail(array $error_context): void {
-    // No mail address, no error mail.
-    if ($this->mailTo == '') {
-      return;
-    }
+    // Rewrite backtrace.
+    $error_context['@backtrace_string'] = $this->getExceptionTraceAsString($error_context['backtrace']);
 
     // Set mail properties.
     $module = 'error_mail';
@@ -106,8 +119,7 @@ class ErrorLogger implements LoggerInterface {
    * @throws \Exception
    */
   public function getMailBody(array $error_context): string {
-    $error_context['@backtrace_string'] = $this->getExceptionTraceAsString($error_context['backtrace']);
-    $formattableMarkup = new FormattableMarkup('%function: @message (line %line of %file) <pre>@backtrace_string</pre>', $error_context);
+    $formattableMarkup = new FormattableMarkup('%exception_class: @message in %function (line %line of %file) <pre>@backtrace_string</pre>', $error_context);
     $body = $formattableMarkup->__toString();
 
     $currentRequest = \Drupal::requestStack()->getCurrentRequest();
@@ -115,8 +127,8 @@ class ErrorLogger implements LoggerInterface {
       '#theme' => 'item_list',
       '#list_type' => 'ul',
       '#items' => [
-        'URI: ' . $currentRequest->getUri(),
-        'Referer: ' . $currentRequest->server->get('HTTP_REFERER'),
+        'URI: ' . $error_context['request_uri'],
+        'Referer: ' . $error_context['referer'],
         'User: ' . \Drupal::currentUser()->getAccountName() . ' (' . \Drupal::currentUser()->getEmail() . ')',
       ],
     ];
