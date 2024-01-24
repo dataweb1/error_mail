@@ -63,16 +63,17 @@ class ErrorLogger implements LoggerInterface {
 
     // Check if the log level is 'emergency', 'alert', 'critical', 'error'.
     if (in_array($level, $this->levels)) {
-      $exception = $context['exception'];
+      $exception = $context['exception'] ?? NULL;
+      if (is_object($exception)) {
+        $class = get_class($exception);
+        if (!ExceptionsToIgnore::ignore($class)) {
+          // Add exception class name to context.
+          $context['%exception_class'] = $class;
 
-      $class = get_class($exception);
-      //if (!ExceptionsToIgnore::ignore($class)) {
-        // Add exception class name to context.
-        $context['%exception_class'] = $class;
-
-        // Handle the error email.
-        $this->sendErrorMail($context);
-      //}
+          // Handle the error email.
+          $this->sendErrorMail($context);
+        }
+      }
     }
   }
 
@@ -83,8 +84,11 @@ class ErrorLogger implements LoggerInterface {
    * @throws \Exception
    */
   protected function sendErrorMail(array $error_context): void {
-    // Rewrite backtrace.
-    $error_context['@backtrace_string'] = $this->getExceptionTraceAsString($error_context['backtrace']);
+    // Rewrite backtrace based on backtrace.
+    $error_context['@backtrace_string']  = '';
+    if (is_array($error_context['backtrace'])) {
+      $error_context['@backtrace_string'] = $this->getExceptionTraceAsString($error_context['backtrace']);
+    }
 
     // Set mail properties.
     $module = 'error_mail';
