@@ -125,7 +125,6 @@ class ErrorLogger implements LoggerInterface {
     $formattableMarkup = new FormattableMarkup('%exception_class: @message in %function (line %line of %file) <pre>@backtrace_string</pre>', $error_context);
     $body = $formattableMarkup->__toString();
 
-    $currentRequest = \Drupal::requestStack()->getCurrentRequest();
     $settings = [
       '#theme' => 'item_list',
       '#list_type' => 'ul',
@@ -136,7 +135,7 @@ class ErrorLogger implements LoggerInterface {
       ],
     ];
 
-    $body .= $this->renderer->render($settings);
+    $body .= $this->renderer->renderPlain($settings);
 
     return $body;
   }
