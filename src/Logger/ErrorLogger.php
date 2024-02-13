@@ -64,7 +64,7 @@ class ErrorLogger implements LoggerInterface {
     // Check if the log level is 'emergency', 'alert', 'critical', 'error'.
     if (in_array($level, $this->levels)) {
       $exception = $context['exception'] ?? NULL;
-      if (is_object($exception)) {
+      if ($exception && is_object($exception)) {
         $class = get_class($exception);
         if (!ExceptionsToIgnore::ignore($class)) {
           // Add exception class name to context.
